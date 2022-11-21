@@ -1,0 +1,21 @@
+input CreateDiceInput {
+  name: String!
+  sides: Int!
+  diceSetId: String!
+}
+
+type Dice {
+  id: String!
+  rolls: [Roll!]
+  set: DiceSet!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+type Query {
+  getDiceById(id: String!): Dice
+}
+
+type Mutation {
+  createDice(input: CreateDiceInput!): Dice  @authentication
+}

@@ -1,0 +1,19 @@
+input CreateRollInput {
+  diceId: String!
+  result: Int!
+}
+
+type Roll {
+  id: String!
+  result: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+type Query {
+  getRollsByDice(diceId: String!): [Roll]  @authentication
+}
+
+type Mutation {
+  createRoll(input: CreateRollInput!): Roll! @authentication
+}

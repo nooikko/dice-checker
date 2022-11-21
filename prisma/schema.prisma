@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Plan {
+  FREE
+  PAID
+}
+
+enum Privacy {
+  PUBLIC
+  PRIVATE
+}
+
+model SystemConfig {
+  id        String  @id @default(cuid())
+  setupMode Boolean @default(true)
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String?
+  password  String
+  verified  Boolean    @default(false)
+  ownedSets DiceSet[]  @relation(name: "Owner")
+  magicLink MagicLink?
+  plan      Plan       @default(FREE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  rolls      Roll[]
+  dice      Dice[]
+}
+
+model MagicLink {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  publicKey String   @unique
+}
+
+model DiceSet {
+  id        String   @id @default(cuid())
+  name      String
+  owner     User     @relation(name: "Owner", fields: [ownerId], references: [id])
+  ownerId   String
+  dice      Dice[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  privacy   Privacy  @default(PUBLIC)
+
+  @@index([ownerId])
+}
+
+model Dice {
+  id        String   @id @default(cuid())
+  name      String
+  sides     Int
+  rolls     Roll[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  diceSet   DiceSet  @relation(fields: [diceSetId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+  userId    String
+  diceSetId     String
+}
+
+model Roll {
+  id        String   @id @default(cuid())
+  result    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  dice      Dice?    @relation(fields: [diceId], references: [id])
+  diceId    String?
+}

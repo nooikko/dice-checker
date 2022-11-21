@@ -1,0 +1,30 @@
+input CreateDiceSetInput {
+  name: String!
+  privacy: Privacy
+}
+
+input UpdateDiceSetInput {
+  id: String!
+  name: String
+  privacy: Privacy
+}
+
+type DiceSet {
+  id: ID!
+  name: String!
+  dice: [Dice!]!
+  owner: User!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+type Query {
+  getDiceSetById(id: ID!): DiceSet!
+  getDiceSets: [DiceSet!] @authentication
+}
+
+type Mutation {
+  createDiceSet(input: CreateDiceSetInput!): DiceSet! @authentication
+  updateDiceSet(id: String!, input: UpdateDiceSetInput!): DiceSet! @authentication
+  deleteDiceSet(id: String!): DiceSet! @authentication
+}
